@@ -161,3 +161,34 @@ GitHub.sublime-settings
 !.vscode/launch.json 
 !.vscode/extensions.json 
 .history
+
+# Ignore local .terraform directory (plugins, modules, etc.)
+.terraform/
+.terraform.lock.hcl
+
+# Ignore state files and state backups (contain secrets & sensitive data)
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Ignore variables containing secrets
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ignore crash logs
+crash.log
+crash.*.log
+
+.terraform/
+*.tfstate
+*.tfstate.backup
+target/
+*.jar
+*.war
+.terraform/
+*.tfstate
+*.tfstate.backup
