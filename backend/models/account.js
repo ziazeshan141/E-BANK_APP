@@ -13,8 +13,8 @@ const mysql = require("mysql");
 
 // MySQL access parameters object
 const connection = mysql.createConnection({
-    host: 'localhost',
-    port: 27018,
+    host: 'ebank-mysql',
+    port: 3306,
     user: 'user',
     password: 'password',
     database: 'ebank',
