@@ -1,4 +1,4 @@
-FROM python:3.14-slim
+FROM python:3.8-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -6,12 +6,24 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
+# Install system dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        libglib2.0-0 \
+        libfreetype6 \
+        libpng16-16 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
 COPY backend/server-python/requirements.txt /app/requirements.txt
 
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy Django application
 COPY backend/server-python/env/pythonserver/ /app/
 
+# Create non-root user
 RUN useradd \
         --create-home \
         --shell /usr/sbin/nologin \
@@ -22,6 +34,7 @@ USER django
 
 EXPOSE 8000
 
+# Start Django with Gunicorn
 CMD ["gunicorn", \
      "--bind", "0.0.0.0:8000", \
      "--workers", "2", \
