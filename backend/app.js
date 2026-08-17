@@ -21,7 +21,7 @@ const mongoose = require("mongoose");
 const postsRoutes = require("./routes/posts");
 const userRoutes = require("./routes/user");
 
-mongoose.connect("mongodb://username:password@127.0.0.1:27017/ebank-users?retryWrites=true", { useNewUrlParser: true, useCreateIndex: true }).then(()=>{
+mongoose.connect("mongodb://username:password@ebank-mongodb:27017/ebank-users?retryWrites=true", { useNewUrlParser: true, useCreateIndex: true }).then(()=>{
 console.log("Connected to MongoDB!");
 }).catch(()=> {
   console.log("Not connected to MongoDB!");
