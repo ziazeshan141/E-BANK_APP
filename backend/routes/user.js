@@ -35,12 +35,12 @@ router.post("/signup", (req, res, next) => {
       name: req.body.name,
       surname: req.body.surname,
       
-      bankAccount: 1, //later will we filled form mySQL db
+      bankAccount: 'TEMP_' + Date.now(), //later will we filled form mySQL db
       
       //Django server fills with random data
       address: '',
-      number: '',
-      hnumber: '',
+      number: 'TEMP_' + Date.now(),
+      hnumber: 'TEMP_' + Date.now(),
       
       //generate user.js
       dateRegistered: getDateTimeNow(),
@@ -53,7 +53,7 @@ router.post("/signup", (req, res, next) => {
             console.log("Error - null value of bankAccount!");
           }
           user.bankAccount = bankAccountId; 
-          fetch('http://127.0.0.1:3002/randomUserData/random/') 
+          fetch('http://ebank-django:8000/randomUserData/random/') 
             .then(function(res) {
               return res.json(); 
             })
@@ -152,7 +152,7 @@ var createNewBankClient = function (userId) {
       0,
       1,
       "${getDateTimeNow()}",
-      "0000-00-00",
+      NULL,
       "${userId}"
     )`;
 

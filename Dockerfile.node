@@ -2,7 +2,7 @@ FROM node:14-bullseye
 
 WORKDIR /app
 
-# Install build dependencies for old native modules such as bcrypt
+# Build dependencies required by bcrypt
 RUN apt-get update && apt-get install -y \
     python3 \
     make \
@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
 
 COPY package*.json ./
 
+# Install dependencies normally so bcrypt builds its native binary
 RUN npm install --omit=dev
 
 COPY backend ./backend

@@ -22,7 +22,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy Django application
 COPY backend/server-python/env/pythonserver/ /app/
-
+COPY backend/server-python/env/files/ /app/files/
 # Create non-root user
 RUN useradd \
         --create-home \

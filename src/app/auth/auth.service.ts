@@ -45,7 +45,7 @@ export class AuthService {
   
   createUser(email: string, password: string, name: string, surname: string) {
     const signupData = { email: email, password: password, name: name, surname: surname };
-    this.http.post('http://localhost:3000/api/user/signup', signupData)
+    this.http.post('/api/user/signup', signupData)
       .subscribe(response => {
         this.router.navigate(['/login']);
         console.log(response);
@@ -54,7 +54,7 @@ export class AuthService {
 
   login(email: string, password: string) {
     const authData: AuthData = { email: email, password: password };
-    this.http.post<{ token: string, expiresIn: number, userId: string }>('http://localhost:3000/api/user/login', authData)
+    this.http.post<{ token: string, expiresIn: number, userId: string }>('/api/user/login', authData)
       .subscribe(response => {
         const token = response.token; 
         this.token = token; 

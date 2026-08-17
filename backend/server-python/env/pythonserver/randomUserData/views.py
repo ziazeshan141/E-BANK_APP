@@ -27,7 +27,7 @@ def index(request):
 class Random(TemplateView):
     #disable: pylint(no-self-argument)
     def getRandomBranch(self):
-        branch = pd.read_csv('C:/proba/mean-course/backend/server-python/env/files/random-branches.csv', delimiter = ',').to_numpy()
+        branch = pd.read_csv('/app/files/random-branches.csv', delimiter = ',').to_numpy()
         randomBranch = branch[np.random.randint(len(branch))]
         ret = str(randomBranch)
         ret = ret[2:len(ret)-2]
@@ -38,7 +38,7 @@ class Random(TemplateView):
         return(num)
 
     def getRandomAddress(self):
-        address = pd.read_csv('C:/proba/mean-course/backend/server-python/env/files/addresses.csv', delimiter = ',').to_numpy()
+        address = pd.read_csv('/app/files/addresses.csv', delimiter = ',').to_numpy()
         address = address[np.random.randint(len(address))]
         add = str(address)
         add = add[2:len(add)-2]

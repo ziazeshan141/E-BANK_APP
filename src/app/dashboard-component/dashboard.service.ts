@@ -47,7 +47,7 @@ export class DashService {
                 limitMonthly: number,
                 usedLimit: number
             }>
-            ('http://localhost:3000/api/user/dash/' + userId)
+            ('/api/user/dash/' + userId)
             .subscribe(res => {
                 userData.name = res.name;
                 userData.surname = res.surname;

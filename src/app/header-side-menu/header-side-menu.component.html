@@ -10,7 +10,7 @@
 <!--Header-->
 <mat-toolbar class="sticky">
   <span>
-    <img class="logo" src="http://localhost:3000/repository/images/logo2.png" alt="Почетна страна" routerLink="/">
+    <img class="logo" src="/repository/images/logo2.png" alt="Почетна страна" routerLink="/">
   </span>
   <span class="spacer"></span>
   <ul>
@@ -41,7 +41,7 @@
     <mat-menu #appMenu="matMenu">
       <button mat-menu-item *ngIf="userIsAuthenticated">Settings</button>
       <button mat-menu-item routerLink="/help" *ngIf="userIsAuthenticated">Help</button>
-      <a class="maroon" mat-menu-item href="http://localhost:3000/repository/documents/terms-and-conditions-template.pdf">Terms of use</a>
+      <a class="maroon" mat-menu-item href="/repository/documents/terms-and-conditions-template.pdf">Terms of use</a>
       <button mat-menu-item routerLink="/help">Corporate documents</button>
       <button mat-menu-item routerLink="/help">Suppliers</button>
       <button mat-menu-item routerLink="/help">Disclaimer</button>

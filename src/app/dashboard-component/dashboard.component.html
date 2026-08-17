@@ -15,7 +15,7 @@
     <mat-card-subtitle class="avatar-title">
       <button mat-raised-button class="contact-btn">Contact support</button>
     </mat-card-subtitle>
-    <img mat-card-avatar mat-card-sm-image class="avatar" src="http://localhost:3000/repository/images/support-f.png"
+    <img mat-card-avatar mat-card-sm-image class="avatar" src="/repository/images/support-f.png"
       alt="Support avatar">
   </mat-card-title-group>
   <mat-card-content class="mat-body-1 info-text flex">You are signed in as: <br> {{user.name}} {{user.surname}}
@@ -96,7 +96,7 @@
       <mat-spinner class="spinner"></mat-spinner>
     </div>
     <div *ngIf="!hasTransactions && !isLoading" class="mat-elevation-z8 list no-overflow">
-      <img mat-card-image class="no-transactions" src="http://localhost:3000/repository/images/no-transactions.jpg"
+      <img mat-card-image class="no-transactions" src="/repository/images/no-transactions.jpg"
         alt="Ништа није пронађено.">
       <p class="no-transactions-message">You have no transactions.</p>
     </div>

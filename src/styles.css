@@ -19,7 +19,7 @@ body {
  }
 
 .bg {
-  background-image: url("http://localhost:3000/repository/images/bg2.jpg");
+  background-image: url("/repository/images/bg2.jpg");
   height: 100%;
   background-position: center;
   background-repeat: no-repeat;

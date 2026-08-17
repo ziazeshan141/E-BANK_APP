@@ -26,7 +26,11 @@ SECRET_KEY = 'y2s35700a9is2l!2qi3=wx23oki^8ri4f@%v40v^@ot$ggqkcs'
 DEBUG = True
 CORS_ORIGIN_ALLOW_ALL = DEBUG
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "ebank-django",
+]
 
 
 # Application definition
