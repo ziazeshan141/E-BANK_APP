@@ -1,35 +1,18 @@
-# ============================================================
-# E-BANK Node.js Backend - Production Dockerfile
-# ============================================================
+FROM node:18-bullseye-slim
 
-FROM node:10-alpine
-
-# Application directory
 WORKDIR /app
 
-# Production environment
-ENV NODE_ENV=production
+# Install production dependencies
+COPY package*.json ./
 
-# Copy dependency files first
-COPY package.json package-lock.json ./
-
-# Install only production dependencies
-RUN npm ci --only=production \
-    && npm cache clean --force
+RUN npm install --omit=dev
 
 # Copy application source
 COPY backend ./backend
 COPY server.js ./
 
-# Create non-root application user
-RUN addgroup -S appgroup \
-    && adduser -S appuser -G appgroup \
-    && chown -R appuser:appgroup /app
-
-USER appuser
-
-# Node API port
+# Application port
 EXPOSE 3000
 
-# Kubernetes-friendly startup
+# Run Node.js API
 CMD ["node", "server.js"]
