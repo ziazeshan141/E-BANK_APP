@@ -192,3 +192,51 @@ target/
 .terraform/
 *.tfstate
 *.tfstate.backup
+
+# Git
+.git
+.gitignore
+.github
+
+# Node
+node_modules
+npm-debug.log
+.npm
+
+# Angular
+dist
+.angular
+tmp
+
+# Tests
+coverage
+e2e
+
+# Python
+__pycache__
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache
+.venv
+venv
+env
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Terraform
+.terraform
+*.tfstate
+*.tfstate.*
+*.tfvars
+
+# Documentation / unnecessary files
+README.md
+Documentation
+pictures
