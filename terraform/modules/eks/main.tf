@@ -9,7 +9,7 @@ module "eks" {
   subnet_ids               = var.private_subnets
   control_plane_subnet_ids = var.private_subnets
 
-  cluster_endpoint_public_access  = true
+  cluster_endpoint_public_access  = false
   cluster_endpoint_private_access = true
 
   # Enables OIDC Provider for IAM Roles for Service Accounts (IRSA)

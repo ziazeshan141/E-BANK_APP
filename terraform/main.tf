@@ -42,6 +42,21 @@ module "iam" {
   service_account_name = "app-service-account"
 }
 
+module "vpc_peering" {
+  source = "./modules/vpc_peering"
+
+  environment  = var.environment
+  ec2_vpc_id   = var.ec2_vpc_id
+  eks_vpc_id   = module.vpc.vpc_id
+  ec2_vpc_cidr = var.ec2_vpc_cidr
+  eks_vpc_cidr = var.vpc_cidr
+
+  ec2_route_table_ids         = var.ec2_route_table_ids
+  eks_private_route_table_ids = [module.vpc.private_route_table_ids[0]]  # see note below
+
+  eks_cluster_security_group_id = module.eks.cluster_security_group_id
+}
+
 # 5. EKS Module (Cluster + OIDC Provider + Access Entries for kubectl)
 module "eks" {
   source           = "./modules/eks"
