@@ -282,9 +282,9 @@ pipeline {
 
                     trivy fs \
                         --scanners vuln,secret,misconfig \
+                        --skip-dirs node_modules \
                         --severity HIGH,CRITICAL \
                         --exit-code 1 \
-                        --ignore-unfixed \
                         .
                 '''
             }

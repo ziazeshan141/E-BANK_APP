@@ -3,7 +3,7 @@ FROM node:14-bullseye
 WORKDIR /app
 
 # Build dependencies required by bcrypt
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     make \
     g++ \
