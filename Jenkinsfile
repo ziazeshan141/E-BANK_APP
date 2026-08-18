@@ -139,7 +139,7 @@ pipeline {
                 sh '''
                     echo "Building Angular frontend..."
 
-                    npm run build -- --configuration=production
+                    NODE_OPTIONS=--openssl-legacy-provider npm run build -- --configuration=production
                 '''
             }
         }
