@@ -176,12 +176,8 @@ pipeline {
 
                 sh '''
                     echo "Running unit tests..."
-
-                    if npm run | grep -q "test"; then
-                        npm test -- --watch=false || exit 1
-                    else
-                        echo "No npm test script configured."
-                    fi
+                    export CHROME_BIN=/usr/bin/chromium-browser
+                    npm test -- --watch=false 
                 '''
             }
         }
