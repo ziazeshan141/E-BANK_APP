@@ -121,7 +121,7 @@ pipeline {
                     sh '''
                         echo "Installing Node.js dependencies..."
 
-                        npm install --omit=dev
+                        npm ci
                     '''
                 }
             }
