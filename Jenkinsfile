@@ -176,7 +176,7 @@ pipeline {
 
                 sh '''
                     echo "Running unit tests..."
-                    export CHROME_BIN=/usr/bin/chromium-browser
+                    export CHROME_BIN=/usr/bin/google-chrome
                     export NODE_OPTIONS=--openssl-legacy-provider
 
                     echo "Chrome version:"
