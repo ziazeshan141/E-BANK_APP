@@ -177,6 +177,7 @@ pipeline {
                 sh '''
                     echo "Running unit tests..."
                     export CHROME_BIN=/usr/bin/chromium-browser
+                    export NODE_OPTIONS=--openssl-legacy-provider
                     npm test -- --watch=false 
                 '''
             }
