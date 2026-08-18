@@ -1,4 +1,4 @@
-# Disclaimer
+# Disclaimer####
 ***This project and its source code should be used for educational purposes only.***
 ***A fictional names "Ebank", "E-bank", "Ebanka", "E-banka", "EBANKA", "EBANK", "E-BANKA", "E-BANK" as far as fictional bank logos and mottos have been used for illustration purpose only.***
 
@@ -156,7 +156,6 @@ Stores user related information. The data tier consists of a two database server
   - Authentication service
   - Dashboard service
   - Posts service
-  - 
   - Auth guard
   - Auth interceptor
   
