@@ -178,7 +178,11 @@ pipeline {
                     echo "Running unit tests..."
                     export CHROME_BIN=/usr/bin/chromium-browser
                     export NODE_OPTIONS=--openssl-legacy-provider
-                    npm test -- --watch=false 
+
+                    echo "Chrome version:"
+                    $CHROME_BIN --version
+
+                    npm test -- --watch=false --browsers=ChromeHeadlessNoSandbox
                 '''
             }
         }
