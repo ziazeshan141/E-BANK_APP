@@ -39,37 +39,14 @@ const storage = multer.diskStorage({
   }
 });
 
+router.put('/:id', checkAuth, multer({storage: storage}).single('image'), (req, res, next) => {
+  let imagePath = req.body.imagePath;
 
-router.post("",checkAuth, multer({storage: storage}).single('image'), (req, res, next) =>{ 
-   const url = req.protocol + '://' + req.get('host'); 
-  const post = new Post({
-    title: req.body.title,
-    content: req.body.content,
-    imagePath: url + '/images/' + req.file.filename,
-    creator: req.userData.userId
-  }) 
- 
-  post.save().then( createdPost => {
-    res.status(201).json({
-     message: "New utility payment created!",
-     post: {
-       id: createdPost._id,
-       title: createdPost.title,
-       content: createdPost.content,
-       imagePath: createdPost.imagePath,
-       creator: createdPost.userId
-     }
-  });
-  });
-});
-
-router.put('/:id', checkAuth, multer({storage: storage}).single('image'), (req, res, next)=>{
-  imagePath = req.body.imagePath;
   if (req.file) {
-    const url = req.protocol + '://' + req.get('host'); 
+    const url = req.protocol + '://' + req.get('host');
     imagePath = url + '/images/' + req.file.filename;
   }
- 
+
   const post = new Post({
     _id: req.body.id,
     title: req.body.title,
@@ -77,60 +54,48 @@ router.put('/:id', checkAuth, multer({storage: storage}).single('image'), (req, 
     imagePath: imagePath
   });
 
-  Post.updateOne({_id: req.params.id, creator: req.userData.userId}, post).then(result =>{
-    if (result.n > 0) { 
-      res.status(200).json({message: 'Successfull change of util payment!'}); 
+  Post.updateOne(
+    {
+      _id: req.params.id,
+      creator: req.userData.userId
+    },
+    post
+  ).then(result => {
+    if (result.matchedCount > 0) {
+      res.status(200).json({
+        message: 'Successfull change of util payment!'
+      });
     } else {
-      res.status(401).json({message: 'User not autorized!'}); 
+      res.status(401).json({
+        message: 'User not autorized!'
+      });
     }
-  });
-});
-
-router.get('', (req, res, next) => {
- 
-  const pageSize = +req.query.pagesize;
-  const currentPage = +req.query.page;
-  const userId = req.query.creator;
-  
-  const postQuery = Post.find({creator: userId});
-  
-  if (pageSize && currentPage) { 
-    postQuery
-      .skip(pageSize * (currentPage - 1)) 
-      .limit(pageSize);
-  }
-  postQuery
-    .then(documents =>{
-      this.fetchedPosts = documents;
-      return Post.countDocuments();
-  })
-    .then(count =>{
-    res.status(200).json({
-      message: "Successfull util payments fetch!",
-      posts: this.fetchedPosts,
-      maxPosts: count
+  }).catch(err => {
+    res.status(500).json({
+      error: err
     });
   });
 });
 
-router.get('/:id',(req,res,next) => {
-  Post.findById(req.params.id).then(post => { 
-    if (post){
-      res.status(200).json(post);
-    } else {
-      res.status(404).json({message: 'Util payment not found!'}); 
-    }
-  });
-});
-router.delete("/:id",checkAuth, (req, res, next) => {
+router.delete("/:id", checkAuth, (req, res, next) => {
   const usID = req.userData.userId;
-  Post.deleteOne({_id: req.params.id, creator: usID}).then(result => {
-    if (result.n > 0) {
-      res.status(200).json({message: 'Util payment deleted!'});
+
+  Post.deleteOne({
+    _id: req.params.id,
+    creator: usID
+  }).then(result => {
+    if (result.deletedCount > 0) {
+      res.status(200).json({
+        message: 'Util payment deleted!'
+      });
     } else {
-      res.status(401).json({message: 'User not autorized!'});
+      res.status(401).json({
+        message: 'User not autorized!'
+      });
     }
+  }).catch(err => {
+    res.status(500).json({
+      error: err
+    });
   });
 });
-
-module.exports = router;

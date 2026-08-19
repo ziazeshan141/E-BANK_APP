@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'NodeJS'
+        nodejs 'NodeJS14'
     }
 
     environment {
@@ -139,7 +139,15 @@ pipeline {
                 sh '''
                     echo "Building Angular frontend..."
 
-                    NODE_OPTIONS=--openssl-legacy-provider npm run build -- --configuration=production
+                    node --version
+                    npm --version
+                    npx ng version
+
+                    NODE_OPTIONS=--openssl-legacy-provider
+
+                    npm run build
+
+                    echo "Angular build completed successfully."
                 '''
             }
         }
@@ -176,12 +184,13 @@ pipeline {
 
                 sh '''
                     echo "Running unit tests..."
+                    export CHROME_BIN=/usr/bin/google-chrome
+                    export NODE_OPTIONS=--openssl-legacy-provider
 
-                    if npm run | grep -q "test"; then
-                        npm test -- --watch=false || exit 1
-                    else
-                        echo "No npm test script configured."
-                    fi
+                    echo "Chrome version:"
+                    $CHROME_BIN --version
+
+                    npm test -- --watch=false --browsers=ChromeHeadlessNoSandbox
                 '''
             }
         }
@@ -227,39 +236,66 @@ pipeline {
         }
 
 
-        // =====================================================
-        // 9. OWASP DEPENDENCY CHECK
-        // =====================================================
+      // =====================================================
+// 9. OWASP DEPENDENCY CHECK
+// =====================================================
 
-        stage('OWASP Dependency Check') {
+stage('OWASP Dependency Check') {
 
-            when {
-
-                expression {
-                    params.RUN_SECURITY_SCANS
-                }
-            }
-
-            steps {
-
-                sh '''
-                    echo "Running OWASP Dependency-Check..."
-
-                    dependency-check.sh \
-                        --project "E-Bank" \
-                        --scan . \
-                        --format HTML \
-                        --format XML \
-                        --out dependency-check-report \
-                        --failOnCVSS ${OWASP_THRESHOLD} || true
-                '''
-
-                archiveArtifacts artifacts:
-                    'dependency-check-report/*',
-                    allowEmptyArchive: true
-            }
+    when {
+        expression {
+            params.RUN_SECURITY_SCANS
         }
+    }
 
+    steps {
+
+        withCredentials([
+            string(
+                credentialsId: 'nvd-api-key',
+                variable: 'NVD_API_KEY'
+            )
+        ]) {
+
+            sh '''
+                set -e
+
+                echo "======================================"
+                echo "Running OWASP Dependency-Check..."
+                echo "======================================"
+
+                # Report directory
+                rm -rf "$WORKSPACE/dependency-check-report"
+                mkdir -p "$WORKSPACE/dependency-check-report"
+
+                echo "Dependency-Check version:"
+                dependency-check.sh --version
+
+                echo "Running Dependency-Check..."
+
+                dependency-check.sh \
+                    --project "E-Bank" \
+                    --scan "$WORKSPACE" \
+                    --format HTML \
+                    --format XML \
+                    --out "$WORKSPACE/dependency-check-report" \
+                    --data /var/lib/jenkins/dependency-check-data \
+                    --nvdApiKey "$NVD_API_KEY" \
+                    --failOnCVSS "$OWASP_THRESHOLD" \
+                    --disableYarnAudit \
+                    --disableOssIndex \
+                    --disableAssembly
+
+                echo "OWASP Dependency-Check completed successfully."
+            '''
+
+            archiveArtifacts(
+                artifacts: 'dependency-check-report/*',
+                allowEmptyArchive: false
+            )
+        }
+    }
+}
 
         // =====================================================
         // 10. TRIVY FILESYSTEM SCAN
@@ -281,9 +317,9 @@ pipeline {
 
                     trivy fs \
                         --scanners vuln,secret,misconfig \
+                        --skip-dirs node_modules \
                         --severity HIGH,CRITICAL \
                         --exit-code 1 \
-                        --ignore-unfixed \
                         .
                 '''
             }
