@@ -158,7 +158,7 @@ var createNewBankClient = function (userId) {
 
     Account.query(queryNode, (err, results, fields) => { 
       if (err) { 
-        reject(console.log(err.message));
+        return reject(err);
       }
       resolve(results.insertId);
     });
@@ -179,69 +179,74 @@ function getDateTimeNow() {
 
 var getBankClient = function (userId) {
   return new Promise(function (resolve, reject) {
-    /*
-    * We carry out protection against SQL injection attacks.
-    * The key (userID) which should be inserted in SQL query
-    * is appended as a function parameter and NOT as a part of
-    * query string. */
-    let queryNode = `
-    SELECT
-     accountID,
-     branch, 
-     limitMonthly, 
-     usedLimit, 
-     currentBalance 
-    FROM 
-     ebank.accounts 
-    WHERE 
-     clientID = ?;`
 
-    Account.query(queryNode, [userId], (err, results, fields) => { 
-      let res = results;
+    let queryNode = `
+      SELECT
+        accountID,
+        branch,
+        limitMonthly,
+        usedLimit,
+        currentBalance
+      FROM
+        ebank.accounts
+      WHERE
+        clientID = ?;
+    `;
+
+    Account.query(queryNode, [userId], (err, results, fields) => {
+
       if (err) {
-        reject(console.log(err.message));
+        return reject(err);
       }
-      getBankClientTransactions(res[0].accountID).then(trans => {
-        res = Object.assign({transactions: {trans}}, res);
-        resolve(res); 
-      }).catch(err=>{
-        console.log(err)
-      });     
+
+      if (!results || results.length === 0) {
+        return reject(new Error("Bank account not found"));
+      }
+
+      getBankClientTransactions(results[0].accountID)
+        .then(trans => {
+
+          const response = Object.assign(
+            { transactions: trans },
+            results
+          );
+
+          resolve(response);
+
+        })
+        .catch(reject);
     });
   });
-}
+};
+
 
 var getBankClientTransactions = function (accountID) {
   return new Promise(function (resolve, reject) {
-      /*
-    * We carry out protection against SQL injection attacks.
-    * The key (userID) which should be inserted in SQL query
-    * is appended as a function parameter and NOT as a part of
-    * query string. */
+
     let queryNode = `
-        SELECT 
-          date, 
-          senderAccountNumber, 
-          amount, 
-          receiverAccountNumber, 
-          dateKnjizenja, 
-          paymentMethod, 
-          description 
-        FROM
-          ebank.transaction
-        WHERE
-          senderAccountNumber = ?
-        ORDER BY date DESC
-  
-        LIMIT 10;
-        `
+      SELECT
+        date,
+        senderAccountNumber,
+        amount,
+        receiverAccountNumber,
+        dateKnjizenja,
+        paymentMethod,
+        description
+      FROM
+        ebank.transaction
+      WHERE
+        senderAccountNumber = ?
+      ORDER BY date DESC
+      LIMIT 10;
+    `;
+
     Account.query(queryNode, [accountID], (err, results, fields) => {
-      let res = results;
+
       if (err) {
-        reject(console.log(err.message));
+        return reject(err);
       }
-      resolve(res);
+
+      resolve(results);
     });
   });
-}
-module.exports = router;
+};
