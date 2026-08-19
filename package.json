@@ -67,7 +67,6 @@
 
   "overrides": {
   "semver": "5.7.2",
-  "serialize-javascript": "7.0.3",
   "tmp": "0.2.6",
   "socket.io-parser": "3.4.5",
   "tar": "7.5.19",
@@ -75,4 +74,3 @@
   "ws": "8.21.0",
   "xmlhttprequest-ssl": "1.6.2"
 }
-  }
