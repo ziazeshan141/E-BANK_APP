@@ -235,7 +235,6 @@ pipeline {
         stage('OWASP Dependency Check') {
 
             when {
-
                 expression {
                     params.RUN_SECURITY_SCANS
                 }
@@ -246,18 +245,20 @@ pipeline {
                 sh '''
                     echo "Running OWASP Dependency-Check..."
 
+                    rm -rf dependency-check-report
+                    mkdir -p dependency-check-report
+
                     dependency-check.sh \
                         --project "E-Bank" \
                         --scan . \
                         --format HTML \
                         --format XML \
-                        --out dependency-check-report \
-                        --failOnCVSS ${OWASP_THRESHOLD} || true
+                        --out "$WORKSPACE/dependency-check-report" \
+                        --failOnCVSS ${OWASP_THRESHOLD}
                 '''
 
-                archiveArtifacts artifacts:
-                    'dependency-check-report/*',
-                    allowEmptyArchive: true
+                archiveArtifacts artifacts: 'dependency-check-report/*',
+                                 allowEmptyArchive: true
             }
         }
 
