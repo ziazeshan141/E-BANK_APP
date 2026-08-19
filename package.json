@@ -73,4 +73,5 @@
   "webpack-dev-middleware": "5.3.4",
   "ws": "8.21.0",
   "xmlhttprequest-ssl": "1.6.2"
+ }
 }
