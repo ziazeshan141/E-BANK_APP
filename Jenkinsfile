@@ -143,8 +143,6 @@ pipeline {
                     npm --version
                     npx ng version
 
-                    NODE_OPTIONS=--openssl-legacy-provider
-
                     npm run build
 
                     echo "Angular build completed successfully."
@@ -185,8 +183,7 @@ pipeline {
                 sh '''
                     echo "Running unit tests..."
                     export CHROME_BIN=/usr/bin/google-chrome
-                    export NODE_OPTIONS=--openssl-legacy-provider
-
+                    
                     echo "Chrome version:"
                     $CHROME_BIN --version
 
