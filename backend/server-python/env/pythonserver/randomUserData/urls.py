@@ -6,5 +6,5 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    url(r'^random/$', views.Random.getRandomData), #.../randomUserData/random
+    path('random/', views.Random.getRandomData),
 ]

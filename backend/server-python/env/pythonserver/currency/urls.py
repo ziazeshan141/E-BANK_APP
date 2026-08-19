@@ -6,5 +6,5 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    url(r'^eur/$', views.Currency.getEur), #.../currency/eur
+    path('eur/', views.Currency.getEur),
 ]
