@@ -249,4 +249,4 @@ var getBankClientTransactions = function (accountID) {
       resolve(results);
     });
   });
-};
+};module.exports = router;

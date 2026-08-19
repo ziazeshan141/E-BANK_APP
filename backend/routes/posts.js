@@ -98,4 +98,4 @@ router.delete("/:id", checkAuth, (req, res, next) => {
       error: err
     });
   });
-});
+});module.exports = router;
