@@ -182,12 +182,19 @@ pipeline {
 
                 sh '''
                     echo "Running unit tests..."
+
                     export CHROME_BIN=/usr/bin/google-chrome
                     
                     echo "Chrome version:"
                     $CHROME_BIN --version
 
-                    npm test -- --watch=false --browsers=ChromeHeadlessNoSandbox
+                    npm test -- --watch=false --browsers=ChromeHeadlessNoSandbox --code-coverage
+
+                    echo "Checking coverage report..."
+                    test -f coverage/mean-course/lcov.info
+
+                    echo "Coverage report generated successfully:"
+                    ls -lh coverage/mean-course/lcov.info
                 '''
             }
         }
@@ -211,6 +218,7 @@ pipeline {
                           -Dsonar.projectName=E-Bank \
                           -Dsonar.sources=. \
                           -Dsonar.exclusions=node_modules/**,dist/**,coverage/**
+                          -Dsonar.javascript.lcov.reportPaths=coverage/mean-course/lcov.info
                     '''
                 }
             }
