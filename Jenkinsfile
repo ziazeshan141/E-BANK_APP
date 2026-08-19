@@ -1,3 +1,4 @@
+```groovy
 pipeline {
     agent any
 
@@ -6,48 +7,26 @@ pipeline {
     }
 
     environment {
-
-        // =====================================================
-        // AWS
-        // =====================================================
         AWS_REGION = 'us-east-2'
         EKS_CLUSTER = 'microservices-dev-eks'
 
-        // Set this in Jenkins or replace with your AWS account ID
         AWS_ACCOUNT_ID = credentials('aws-account-id')
-
         ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
-        // =====================================================
-        // ECR repositories
-        // =====================================================
         FRONTEND_REPO = 'ebank-frontend'
         NODE_REPO     = 'ebank-node'
         DJANGO_REPO   = 'ebank-django'
 
-        // =====================================================
-        // Kubernetes
-        // =====================================================
         K8S_NAMESPACE = 'ebank'
 
-        // =====================================================
-        // SonarQube
-        // =====================================================
         SONARQUBE_SERVER = 'SonarQube'
 
-        // =====================================================
-        // Security
-        // =====================================================
         OWASP_THRESHOLD = '7'
 
-        // =====================================================
-        // Docker image tag
-        // =====================================================
         IMAGE_TAG = "${BUILD_NUMBER}"
     }
 
     parameters {
-
         booleanParam(
             name: 'DEPLOY_TO_EKS',
             defaultValue: true,
@@ -69,29 +48,15 @@ pipeline {
 
     stages {
 
-        // =====================================================
-        // 1. CHECKOUT
-        // =====================================================
-
         stage('Checkout') {
-
             steps {
-
                 echo 'Checking out E-Bank source code...'
-
                 checkout scm
             }
         }
 
-
-        // =====================================================
-        // 2. ENVIRONMENT CHECK
-        // =====================================================
-
         stage('Environment Check') {
-
             steps {
-
                 sh '''
                     echo "======================================"
                     echo "Environment"
@@ -107,35 +72,17 @@ pipeline {
             }
         }
 
-
-        // =====================================================
-        // 3. INSTALL BACKEND DEPENDENCIES
-        // =====================================================
-
         stage('Install Node Dependencies') {
-
             steps {
-
-                dir('') {
-
-                    sh '''
-                        echo "Installing Node.js dependencies..."
-
-                        npm ci
-                    '''
-                }
+                sh '''
+                    echo "Installing Node.js dependencies..."
+                    npm ci
+                '''
             }
         }
 
-
-        // =====================================================
-        // 4. FRONTEND BUILD
-        // =====================================================
-
         stage('Build Angular Frontend') {
-
             steps {
-
                 sh '''
                     echo "Building Angular frontend..."
 
@@ -150,15 +97,8 @@ pipeline {
             }
         }
 
-
-        // =====================================================
-        // 5. DJANGO CHECK
-        // =====================================================
-
         stage('Django Check') {
-
             steps {
-
                 sh '''
                     echo "Checking Django application..."
 
@@ -171,23 +111,19 @@ pipeline {
             }
         }
 
-
-        // =====================================================
-        // 6. UNIT TESTS
-        // =====================================================
-
         stage('Unit Tests') {
-
             steps {
-
                 sh '''
                     echo "Running unit tests..."
 
                     export CHROME_BIN=/usr/bin/google-chrome
-                    
+
                     $CHROME_BIN --version
 
-                    npm test -- --watch=false --browsers=ChromeHeadlessNoSandbox --code-coverage
+                    npm test -- \
+                        --watch=false \
+                        --browsers=ChromeHeadlessNoSandbox \
+                        --code-coverage
 
                     echo "Checking generated coverage..."
                     ls -lh coverage/mean-course/lcov.info
@@ -195,17 +131,9 @@ pipeline {
             }
         }
 
-
-        // =====================================================
-        // 7. SONARQUBE ANALYSIS
-        // =====================================================
-
         stage('SonarQube Analysis') {
-
             steps {
-
                 withSonarQubeEnv("${SONARQUBE_SERVER}") {
-
                     sh '''
                         echo "Running SonarQube analysis..."
 
@@ -226,100 +154,75 @@ pipeline {
             }
         }
 
-
-        // =====================================================
-        // 8. SONARQUBE QUALITY GATE
-        // =====================================================
-
         stage('SonarQube Quality Gate') {
-
             steps {
-
                 timeout(time: 5, unit: 'MINUTES') {
-
                     waitForQualityGate abortPipeline: true
                 }
             }
         }
 
-
-      // =====================================================
-      // 9. OWASP DEPENDENCY CHECK
-     // =====================================================
-
-stage('OWASP Dependency Check') {
-
-    when {
-        expression {
-            params.RUN_SECURITY_SCANS
-        }
-    }
-
-    steps {
-
-        withCredentials([
-            string(
-                credentialsId: 'nvd-api-key',
-                variable: 'NVD_API_KEY'
-            )
-        ]) {
-
-            sh '''
-                set -e
-
-                echo "======================================"
-                echo "Running OWASP Dependency-Check..."
-                echo "======================================"
-
-                rm -rf "$WORKSPACE/dependency-check-report"
-                mkdir -p "$WORKSPACE/dependency-check-report"
-
-                echo "Dependency-Check version:"
-                dependency-check.sh --version
-
-                echo "Running Dependency-Check..."
-
-                dependency-check.sh \
-                    --project "E-Bank" \
-                    --scan "$WORKSPACE" \
-                    --format HTML \
-                    --format XML \
-                    --out "$WORKSPACE/dependency-check-report" \
-                    --data /var/lib/jenkins/dependency-check-data \
-                    --nvdApiKey "$NVD_API_KEY" \
-                    --disableYarnAudit \
-                    --disableOssIndex \
-                    --disableAssembly
-
-                echo "OWASP Dependency-Check completed."
-                echo "Vulnerabilities are reported but do not block the pipeline."
-            '''
-
-            archiveArtifacts(
-                artifacts: 'dependency-check-report/*',
-                allowEmptyArchive: false
-            )
-        }
-    }
-}
-```
-
-
-        // =====================================================
-        // 10. TRIVY FILESYSTEM SCAN
-        // =====================================================
-
-        stage('Trivy Filesystem Scan') {
-
+        stage('OWASP Dependency Check') {
             when {
-
                 expression {
                     params.RUN_SECURITY_SCANS
                 }
             }
 
             steps {
+                withCredentials([
+                    string(
+                        credentialsId: 'nvd-api-key',
+                        variable: 'NVD_API_KEY'
+                    )
+                ]) {
+                    sh '''
+                        set -e
 
+                        echo "======================================"
+                        echo "Running OWASP Dependency-Check..."
+                        echo "======================================"
+
+                        rm -rf "$WORKSPACE/dependency-check-report"
+                        mkdir -p "$WORKSPACE/dependency-check-report"
+
+                        echo "Dependency-Check version:"
+                        dependency-check.sh --version
+
+                        echo "Running Dependency-Check..."
+
+                        dependency-check.sh \
+                            --project "E-Bank" \
+                            --scan "$WORKSPACE" \
+                            --format HTML \
+                            --format XML \
+                            --out "$WORKSPACE/dependency-check-report" \
+                            --data /var/lib/jenkins/dependency-check-data \
+                            --nvdApiKey "$NVD_API_KEY" \
+                            --disableYarnAudit \
+                            --disableOssIndex \
+                            --disableAssembly
+
+                        echo "OWASP Dependency-Check completed."
+                        echo "Vulnerabilities are reported but do not block the pipeline."
+                    '''
+
+                    archiveArtifacts(
+                        artifacts: 'dependency-check-report/*',
+                        allowEmptyArchive: false
+                    )
+                }
+            }
+        }
+
+        stage('Trivy Filesystem Scan') {
+            when {
+                expression {
+                    params.RUN_SECURITY_SCANS
+                }
+            }
+
+            steps {
                 sh '''
                     echo "Running Trivy filesystem scan..."
 
@@ -327,24 +230,17 @@ stage('OWASP Dependency Check') {
                         --scanners vuln,secret,misconfig \
                         --skip-dirs node_modules \
                         --severity HIGH,CRITICAL \
-                        --exit-code 1 \
+                        --exit-code 0 \
                         .
 
-                        echo "Trivy filesystem scan completed."
-                        echo "Findings are reported but do not block the pipeline."
+                    echo "Trivy filesystem scan completed."
+                    echo "Findings are reported but do not block the pipeline."
                 '''
             }
         }
 
-
-        // =====================================================
-        // 11. DOCKER BUILD
-        // =====================================================
-
         stage('Docker Build') {
-
             steps {
-
                 sh '''
                     echo "Building Docker images..."
 
@@ -369,22 +265,14 @@ stage('OWASP Dependency Check') {
             }
         }
 
-
-        // =====================================================
-        // 12. TRIVY DOCKER IMAGE SCAN
-        // =====================================================
-
         stage('Trivy Docker Image Scan') {
-
             when {
-
                 expression {
                     params.RUN_SECURITY_SCANS
                 }
             }
 
             steps {
-
                 sh '''
                     echo "Scanning Docker images..."
 
@@ -409,27 +297,18 @@ stage('OWASP Dependency Check') {
             }
         }
 
-
-        // =====================================================
-        // 13. LOGIN TO AWS ECR
-        // =====================================================
-
         stage('ECR Login') {
-
             when {
-
                 expression {
                     params.PUSH_TO_ECR
                 }
             }
 
             steps {
-
                 withCredentials([
                     [$class: 'AmazonWebServicesCredentialsBinding',
                      credentialsId: 'aws-ecr-credentials']
                 ]) {
-
                     sh '''
                         echo "Logging into Amazon ECR..."
 
@@ -444,67 +323,40 @@ stage('OWASP Dependency Check') {
             }
         }
 
-
-        // =====================================================
-        // 14. PUSH TO ECR
-        // =====================================================
-
         stage('Push Images to ECR') {
-
             when {
-
                 expression {
                     params.PUSH_TO_ECR
                 }
             }
 
             steps {
-
                 sh '''
                     echo "Pushing images to ECR..."
 
-                    docker push \
-                        ${ECR_REGISTRY}/${FRONTEND_REPO}:${IMAGE_TAG}
+                    docker push ${ECR_REGISTRY}/${FRONTEND_REPO}:${IMAGE_TAG}
+                    docker push ${ECR_REGISTRY}/${NODE_REPO}:${IMAGE_TAG}
+                    docker push ${ECR_REGISTRY}/${DJANGO_REPO}:${IMAGE_TAG}
 
-                    docker push \
-                        ${ECR_REGISTRY}/${NODE_REPO}:${IMAGE_TAG}
-
-                    docker push \
-                        ${ECR_REGISTRY}/${DJANGO_REPO}:${IMAGE_TAG}
-
-                    docker push \
-                        ${ECR_REGISTRY}/${FRONTEND_REPO}:latest
-
-                    docker push \
-                        ${ECR_REGISTRY}/${NODE_REPO}:latest
-
-                    docker push \
-                        ${ECR_REGISTRY}/${DJANGO_REPO}:latest
+                    docker push ${ECR_REGISTRY}/${FRONTEND_REPO}:latest
+                    docker push ${ECR_REGISTRY}/${NODE_REPO}:latest
+                    docker push ${ECR_REGISTRY}/${DJANGO_REPO}:latest
                 '''
             }
         }
 
-
-        // =====================================================
-        // 15. EKS CONFIGURATION
-        // =====================================================
-
         stage('Configure EKS') {
-
             when {
-
                 expression {
                     params.DEPLOY_TO_EKS
                 }
             }
 
             steps {
-
                 withCredentials([
                     [$class: 'AmazonWebServicesCredentialsBinding',
                      credentialsId: 'aws-ecr-credentials']
                 ]) {
-
                     sh '''
                         echo "Configuring kubectl for EKS..."
 
@@ -513,29 +365,20 @@ stage('OWASP Dependency Check') {
                             --name ${EKS_CLUSTER}
 
                         kubectl cluster-info
-
                         kubectl get nodes
                     '''
                 }
             }
         }
 
-
-        // =====================================================
-        // 16. KUBERNETES NAMESPACE
-        // =====================================================
-
         stage('Create Kubernetes Namespace') {
-
             when {
-
                 expression {
                     params.DEPLOY_TO_EKS
                 }
             }
 
             steps {
-
                 sh '''
                     kubectl create namespace ${K8S_NAMESPACE} \
                         --dry-run=client \
@@ -544,22 +387,14 @@ stage('OWASP Dependency Check') {
             }
         }
 
-
-        // ======================================================
-        // 17. DEPLOY TO EKS
-        // ======================================================
-
         stage('Deploy to EKS') {
-
             when {
-
                 expression {
                     params.DEPLOY_TO_EKS
                 }
             }
 
             steps {
-
                 sh '''
                     echo "Deploying E-Bank to EKS..."
 
@@ -569,46 +404,33 @@ stage('OWASP Dependency Check') {
 
                     kubectl set image deployment/ebank-frontend \
                         ebank-frontend=${ECR_REGISTRY}/${FRONTEND_REPO}:${IMAGE_TAG} \
-                        -n ${K8S_NAMESPACE} || true
+                        -n ${K8S_NAMESPACE}
 
                     kubectl set image deployment/ebank-node \
                         ebank-node=${ECR_REGISTRY}/${NODE_REPO}:${IMAGE_TAG} \
-                        -n ${K8S_NAMESPACE} || true
+                        -n ${K8S_NAMESPACE}
 
                     kubectl set image deployment/ebank-django \
                         ebank-django=${ECR_REGISTRY}/${DJANGO_REPO}:${IMAGE_TAG} \
-                        -n ${K8S_NAMESPACE} || true
+                        -n ${K8S_NAMESPACE}
                 '''
             }
         }
 
-
-        // =====================================================
-        // 18. ROLLOUT VERIFICATION
-        // =====================================================
-
         stage('Verify Deployment') {
-
             when {
-
                 expression {
                     params.DEPLOY_TO_EKS
                 }
             }
 
             steps {
-
                 sh '''
                     echo "Checking Kubernetes resources..."
 
-                    kubectl get pods \
-                        -n ${K8S_NAMESPACE}
-
-                    kubectl get deployments \
-                        -n ${K8S_NAMESPACE}
-
-                    kubectl get services \
-                        -n ${K8S_NAMESPACE}
+                    kubectl get pods -n ${K8S_NAMESPACE}
+                    kubectl get deployments -n ${K8S_NAMESPACE}
+                    kubectl get services -n ${K8S_NAMESPACE}
 
                     echo "Checking rollouts..."
 
@@ -631,15 +453,8 @@ stage('OWASP Dependency Check') {
         }
     }
 
-
-    // =========================================================
-    // POST ACTIONS
-    // =========================================================
-
     post {
-
         success {
-
             echo '''
             ============================================
             E-BANK CI/CD SUCCESS
@@ -654,7 +469,6 @@ stage('OWASP Dependency Check') {
         }
 
         failure {
-
             echo '''
             ============================================
             E-BANK CI/CD FAILED
@@ -665,10 +479,9 @@ stage('OWASP Dependency Check') {
         }
 
         always {
-
             echo "Cleaning Jenkins workspace..."
-
             cleanWs()
         }
     }
 }
+```
