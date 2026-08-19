@@ -50,6 +50,15 @@ app.use((req, res, next) =>{
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS");
   next(); // when finished go on (middleware)
 });
-app.use("/api/posts", postsRoutes); // for a given URL call post.js route handler 
-app.use("/api/user", userRoutes);// for a given URL call user.js user handler 
+app.use("/api/posts", postsRoutes);
+app.use("/api/user", userRoutes);
+
+// Serve Angular production build
+app.use(express.static(path.join(__dirname, "../dist/mean-course")));
+
+// Angular route fallback
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../dist/mean-course/index.html"));
+});
+
 module.exports = app;
