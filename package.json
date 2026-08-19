@@ -64,14 +64,5 @@
     "tslint": "~5.11.0",
     "typescript": "3.2.4"
   },
-
-  "overrides": {
-    "semver": "5.7.2",
-    "tmp": "0.2.6",
-    "socket.io-parser": "3.4.5",
-    "tar": "7.5.19",
-    "webpack-dev-middleware": "5.3.4",
-    "ws": "8.21.0",
-    "xmlhttprequest-ssl": "1.6.2"
-  }
 }
+ 
