@@ -185,15 +185,11 @@ pipeline {
 
                     export CHROME_BIN=/usr/bin/google-chrome
                     
-                    echo "Chrome version:"
                     $CHROME_BIN --version
 
                     npm test -- --watch=false --browsers=ChromeHeadlessNoSandbox --code-coverage
 
-                    echo "Checking coverage report..."
-                    test -f coverage/mean-course/lcov.info
-
-                    echo "Coverage report generated successfully:"
+                    echo "Checking generated coverage..."
                     ls -lh coverage/mean-course/lcov.info
                 '''
             }
@@ -213,10 +209,16 @@ pipeline {
                     sh '''
                         echo "Running SonarQube analysis..."
 
+                        echo "Checking coverage file..."
+                        ls -lh coverage/mean-course/lcov.info
+
+                        echo "Coverage file:"
+                        head -20 coverage/mean-course/lcov.info
+
                         sonar-scanner \
                           -Dsonar.projectKey=ebank \
                           -Dsonar.projectName=E-Bank \
-                          -Dsonar.sources=. \
+                          -Dsonar.sources=src \
                           -Dsonar.exclusions=node_modules/**,dist/**,coverage/** \
                           -Dsonar.javascript.lcov.reportPaths=coverage/mean-course/lcov.info
                     '''
@@ -242,8 +244,8 @@ pipeline {
 
 
       // =====================================================
-// 9. OWASP DEPENDENCY CHECK
-// =====================================================
+      // 9. OWASP DEPENDENCY CHECK
+     // =====================================================
 
 stage('OWASP Dependency Check') {
 
