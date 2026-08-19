@@ -23,10 +23,6 @@ const userRoutes = require("./routes/user");
 
 mongoose.connect(
   "mongodb://username:password@ebank-mongodb:27017/ebank-users?authSource=admin",
-  {
-    useNewUrlParser: true,
-    useCreateIndex: true
-  }
 ).then(() => {
   console.log("Connected to MongoDB!");
 }).catch(()=> {
