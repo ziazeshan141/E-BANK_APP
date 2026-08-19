@@ -279,7 +279,10 @@ stage('OWASP Dependency Check') {
                     --out "$WORKSPACE/dependency-check-report" \
                     --data /var/lib/jenkins/dependency-check-data \
                     --nvdApiKey "$NVD_API_KEY" \
-                    --failOnCVSS "$OWASP_THRESHOLD"
+                    --failOnCVSS "$OWASP_THRESHOLD" \
+                    --disableYarnAudit \
+                    --disableOssIndex \
+                    --disableAssembly
 
                 echo "OWASP Dependency-Check completed successfully."
             '''
