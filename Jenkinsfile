@@ -228,49 +228,69 @@ pipeline {
         }
 
 
-        // =====================================================
-        // 9. OWASP DEPENDENCY CHECK
-        // =====================================================
+      // =====================================================
+// 9. OWASP DEPENDENCY CHECK
+// =====================================================
 
-        stage('OWASP Dependency Check') {
+stage('OWASP Dependency Check') {
 
-            when {
-                expression {
-                    params.RUN_SECURITY_SCANS
-                }
-            }
-
-            steps {
-
-                withCredentials([
-                   string(
-                       credentialsId: 'nvd-api-key',
-                       variable: 'NVD_API_KEY'
-                    )  
-                ]) {
-
-                sh '''
-                    echo "Running OWASP Dependency-Check..."
-
-                    rm -rf dependency-check-report
-                    mkdir -p dependency-check-report
-
-                    dependency-check.sh \
-                        --project "E-Bank" \
-                        --scan "$WORKSPACE" \
-                        --format HTML \
-                        --format XML \
-                        --out "$WORKSPACE/dependency-check-report" \
-                        --data /var/lib/jenkins/dependency-check-data \
-                        --nvdApiKey "$NVD_API_KEY" \
-                        --failOnCVSS ${OWASP_THRESHOLD}
-                '''
-
-                archiveArtifacts artifacts: 'dependency-check-report/*',
-                                 allowEmptyArchive: true
-            }
+    when {
+        expression {
+            params.RUN_SECURITY_SCANS
         }
+    }
 
+    steps {
+
+        withCredentials([
+            string(
+                credentialsId: 'nvd-api-key',
+                variable: 'NVD_API_KEY'
+            )
+        ]) {
+
+            sh '''
+                set -e
+
+                echo "======================================"
+                echo "Running OWASP Dependency-Check..."
+                echo "======================================"
+
+                # Report directory
+                rm -rf "$WORKSPACE/dependency-check-report"
+                mkdir -p "$WORKSPACE/dependency-check-report"
+
+                # Dependency-Check persistent database
+                mkdir -p /var/lib/jenkins/dependency-check-data
+
+                # Make sure Jenkins can access the database directory
+                chmod 755 /var/lib/jenkins/dependency-check-data
+
+                echo "Dependency-Check version:"
+                dependency-check.sh --version
+
+                echo "Running Dependency-Check..."
+
+                dependency-check.sh \
+                    --project "E-Bank" \
+                    --scan "$WORKSPACE" \
+                    --format HTML \
+                    --format XML \
+                    --out "$WORKSPACE/dependency-check-report" \
+                    --data /var/lib/jenkins/dependency-check-data \
+                    --nvdApiKey "$NVD_API_KEY" \
+                    --failOnCVSS "$OWASP_THRESHOLD"
+
+                echo "OWASP Dependency-Check completed successfully."
+            '''
+
+            archiveArtifacts(
+                artifacts: 'dependency-check-report/*',
+                allowEmptyArchive: true
+            )
+        }
+    }
+}
 
         // =====================================================
         // 10. TRIVY FILESYSTEM SCAN
