@@ -242,6 +242,13 @@ pipeline {
 
             steps {
 
+                withCredentials([
+                   string(
+                       credentialsId: 'nvd-api-key',
+                       variable: 'NVD_API_KEY'
+                    )  
+                ]) {
+
                 sh '''
                     echo "Running OWASP Dependency-Check..."
 
@@ -250,10 +257,12 @@ pipeline {
 
                     dependency-check.sh \
                         --project "E-Bank" \
-                        --scan . \
+                        --scan "$WORKSPACE" \
                         --format HTML \
                         --format XML \
                         --out "$WORKSPACE/dependency-check-report" \
+                        --data /var/lib/jenkins/dependency-check-data \
+                        --nvdApiKey "$NVD_API_KEY" \
                         --failOnCVSS ${OWASP_THRESHOLD}
                 '''
 
