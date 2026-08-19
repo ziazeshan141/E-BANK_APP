@@ -260,12 +260,6 @@ stage('OWASP Dependency Check') {
                 rm -rf "$WORKSPACE/dependency-check-report"
                 mkdir -p "$WORKSPACE/dependency-check-report"
 
-                # Dependency-Check persistent database
-                mkdir -p /var/lib/jenkins/dependency-check-data
-
-                # Make sure Jenkins can access the database directory
-                chmod 755 /var/lib/jenkins/dependency-check-data
-
                 echo "Dependency-Check version:"
                 dependency-check.sh --version
 
@@ -289,7 +283,7 @@ stage('OWASP Dependency Check') {
 
             archiveArtifacts(
                 artifacts: 'dependency-check-report/*',
-                allowEmptyArchive: true
+                allowEmptyArchive: false
             )
         }
     }
