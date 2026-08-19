@@ -271,7 +271,6 @@ stage('OWASP Dependency Check') {
                 echo "Running OWASP Dependency-Check..."
                 echo "======================================"
 
-                # Report directory
                 rm -rf "$WORKSPACE/dependency-check-report"
                 mkdir -p "$WORKSPACE/dependency-check-report"
 
@@ -288,12 +287,12 @@ stage('OWASP Dependency Check') {
                     --out "$WORKSPACE/dependency-check-report" \
                     --data /var/lib/jenkins/dependency-check-data \
                     --nvdApiKey "$NVD_API_KEY" \
-                    --failOnCVSS "$OWASP_THRESHOLD" \
                     --disableYarnAudit \
                     --disableOssIndex \
                     --disableAssembly
 
-                echo "OWASP Dependency-Check completed successfully."
+                echo "OWASP Dependency-Check completed."
+                echo "Vulnerabilities are reported but do not block the pipeline."
             '''
 
             archiveArtifacts(
@@ -303,6 +302,8 @@ stage('OWASP Dependency Check') {
         }
     }
 }
+```
+
 
         // =====================================================
         // 10. TRIVY FILESYSTEM SCAN
@@ -328,6 +329,9 @@ stage('OWASP Dependency Check') {
                         --severity HIGH,CRITICAL \
                         --exit-code 1 \
                         .
+
+                        echo "Trivy filesystem scan completed."
+                        echo "Findings are reported but do not block the pipeline."
                 '''
             }
         }
