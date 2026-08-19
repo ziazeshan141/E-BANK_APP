@@ -1,6 +1,9 @@
+```json
 {
   "name": "mean-course",
   "version": "0.0.0",
+  "private": true,
+
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -10,7 +13,7 @@
     "e2e": "ng e2e",
     "start:server": "nodemon server.js"
   },
-  "private": true,
+
   "dependencies": {
     "@angular/animations": "^7.2.15",
     "@angular/cdk": "^7.3.7",
@@ -39,6 +42,7 @@
     "tslib": "^1.9.0",
     "zone.js": "~0.8.26"
   },
+
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.13.0",
     "@angular/cli": "~7.3.4",
@@ -49,7 +53,7 @@
     "@types/node": "~8.9.4",
     "codelyzer": "~4.5.0",
     "jasmine-core": "~2.99.1",
-    "jasmine-spec-reporter": "~4.2.1",
+    "jasmine-spec-reporter": "~4.2.0",
     "karma": "~4.0.0",
     "karma-chrome-launcher": "~2.2.0",
     "karma-coverage-istanbul-reporter": "~2.0.1",
@@ -60,5 +64,19 @@
     "ts-node": "^7.0.1",
     "tslint": "~5.11.0",
     "typescript": "3.2.4"
+  },
+
+  "overrides": {
+    "overrides": {
+  "semver": "5.7.2",
+  "serialize-javascript": "7.0.3",
+  "tmp": "0.2.6",
+  "socket.io-parser": "3.4.5",
+  "tar": "7.5.19",
+  "webpack-dev-middleware": "5.3.4",
+  "ws": "8.21.0",
+  "xmlhttprequest-ssl": "1.6.2"
+}
   }
 }
+```
