@@ -22,7 +22,7 @@ const postsRoutes = require("./routes/posts");
 const userRoutes = require("./routes/user");
 
 mongoose.connect(
-  "mongodb://username:password@ebank-mongodb:27017/ebank-users?authSource=admin",
+  "mongodb://username:password@127.0.0.1:27017/ebank-users?authSource=admin",
 ).then(() => {
   console.log("Connected to MongoDB!");
 }).catch(()=> {
