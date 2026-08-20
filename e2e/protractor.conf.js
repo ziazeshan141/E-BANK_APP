@@ -21,6 +21,7 @@ exports.config = {
   },
 
   directConnect: true,
+  chromeDriver: '/home/ubuntu/E-BANK_APP/chromedriver/chromedriver',
 
   baseUrl: 'http://localhost:4200/',
 
