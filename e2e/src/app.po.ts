@@ -7,7 +7,7 @@ export class AppPage {
   }
 
   getLoginTitle() {
-    return element(by.css('mat-card-title:not(.logo-name)')).getText();
+    return element(by.css('mat-card-title:not(.logo-name)')).getText() as Promise<string>;
   }
 
   getEmailInput() {

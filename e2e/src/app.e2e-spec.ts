@@ -1,6 +1,3 @@
-# E-Bank Login E2E Test
-
-```ts
 import { AppPage } from './app.po';
 import { browser, logging } from 'protractor';
 
@@ -30,4 +27,3 @@ describe('E-Bank Login', () => {
     expect(severeLogs).toEqual([]);
   });
 });
-```
