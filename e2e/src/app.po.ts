@@ -1,11 +1,24 @@
 import { browser, by, element } from 'protractor';
 
 export class AppPage {
-  navigateTo() {
-    return browser.get(browser.baseUrl) as Promise<any>;
+
+  navigateToLogin() {
+    return browser.get('/login');
   }
 
-  getTitleText() {
-    return element(by.css('app-root h1')).getText() as Promise<string>;
+  getLoginTitle() {
+    return element(by.css('mat-card-title:not(.logo-name)')).getText();
+  }
+
+  getEmailInput() {
+    return element(by.css('input[name="email"]'));
+  }
+
+  getPasswordInput() {
+    return element(by.css('input[name="password"]'));
+  }
+
+  getLoginButton() {
+    return element(by.css('button[type="submit"]'));
   }
 }

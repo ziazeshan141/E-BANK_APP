@@ -1,23 +1,33 @@
+# E-Bank Login E2E Test
+
+```ts
 import { AppPage } from './app.po';
 import { browser, logging } from 'protractor';
 
-describe('workspace-project App', () => {
+describe('E-Bank Login', () => {
   let page: AppPage;
 
   beforeEach(() => {
     page = new AppPage();
   });
 
-  it('should display welcome message', () => {
-    page.navigateTo();
-    expect(page.getTitleText()).toEqual('Welcome to mean-course!');
+  it('should display the login page', async () => {
+    await page.navigateToLogin();
+
+    expect(await page.getLoginTitle()).toEqual('User Sign In');
+    expect(await page.getEmailInput().isPresent()).toBe(true);
+    expect(await page.getPasswordInput().isPresent()).toBe(true);
+    expect(await page.getLoginButton().isPresent()).toBe(true);
   });
 
   afterEach(async () => {
-    // Assert that there are no errors emitted from the browser
     const logs = await browser.manage().logs().get(logging.Type.BROWSER);
-    expect(logs).not.toContain(jasmine.objectContaining({
-      level: logging.Level.SEVERE,
-    } as logging.Entry));
+
+    const severeLogs = logs.filter(
+      log => log.level === logging.Level.SEVERE
+    );
+
+    expect(severeLogs).toEqual([]);
   });
 });
+```
