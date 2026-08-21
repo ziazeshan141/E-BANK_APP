@@ -9,12 +9,14 @@ pipeline {
         AWS_REGION = 'us-east-2'
         EKS_CLUSTER = 'microservices-dev-eks'
 
+        ENVIRONMENT = "dev"
+
         AWS_ACCOUNT_ID = credentials('aws-account-id')
         ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
-        FRONTEND_REPO = 'ebank-frontend'
-        NODE_REPO     = 'ebank-node'
-        DJANGO_REPO   = 'ebank-django'
+        FRONTEND_REPO = '${ENVIRONMENT}-ebank-frontend'
+        NODE_REPO     = '${ENVIRONMENT}-ebank-node-backend'
+        DJANGO_REPO   = '${ENVIRONMENT}-ebank-django-backend'
 
         K8S_NAMESPACE = 'ebank'
 
