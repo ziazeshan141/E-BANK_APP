@@ -7,24 +7,23 @@ pipeline {
 
     environment {
         AWS_REGION = 'us-east-2'
+        ENVIRONMENT = "dev"
         EKS_CLUSTER = 'microservices-dev-eks'
 
-        ENVIRONMENT = "dev"
+        IMAGE_TAG = "${BUILD_NUMBER}"
 
         AWS_ACCOUNT_ID = credentials('aws-account-id')
         ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
-        FRONTEND_REPO = '${ENVIRONMENT}-ebank-frontend'
-        NODE_REPO     = '${ENVIRONMENT}-ebank-node-backend'
-        DJANGO_REPO   = '${ENVIRONMENT}-ebank-django-backend'
+        FRONTEND_REPO = "${ENVIRONMENT}-ebank-frontend"
+        NODE_REPO     = "${ENVIRONMENT}-ebank-node-backend"
+        DJANGO_REPO   = "${ENVIRONMENT}-ebank-django-backend"
 
         K8S_NAMESPACE = 'ebank'
 
         SONARQUBE_SERVER = 'SonarQube'
 
         OWASP_THRESHOLD = '7'
-
-        IMAGE_TAG = "${BUILD_NUMBER}"
     }
 
     parameters {
