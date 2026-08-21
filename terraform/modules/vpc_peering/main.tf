@@ -20,9 +20,11 @@ resource "aws_vpc_peering_connection_accepter" "accept" {
   }
 }
 
-# Routes from EC2 VPC -> EKS VPC
 resource "aws_route" "ec2_to_eks" {
-  for_each = toset(var.ec2_route_table_ids)
+  for_each = {
+    for idx, route_table_id in var.ec2_route_table_ids :
+    tostring(idx) => route_table_id
+  }
 
   route_table_id            = each.value
   destination_cidr_block    = var.eks_vpc_cidr
@@ -31,9 +33,11 @@ resource "aws_route" "ec2_to_eks" {
   depends_on = [aws_vpc_peering_connection_accepter.accept]
 }
 
-# Routes from EKS VPC (all subnets - EKS control plane ENIs span every subnet you gave it)
 resource "aws_route" "eks_to_ec2" {
-  for_each = toset(var.eks_private_route_table_ids)
+  for_each = {
+    for idx, route_table_id in var.eks_private_route_table_ids :
+    tostring(idx) => route_table_id
+  }
 
   route_table_id            = each.value
   destination_cidr_block    = var.ec2_vpc_cidr
