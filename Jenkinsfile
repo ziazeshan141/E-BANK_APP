@@ -8,7 +8,7 @@ pipeline {
     environment {
         AWS_REGION = 'us-east-2'
         ENVIRONMENT = "dev"
-        EKS_CLUSTER = 'microservices-dev-eks'
+        EKS_CLUSTER = 'my-modular-eks'
 
         IMAGE_TAG = "${BUILD_NUMBER}"
 
