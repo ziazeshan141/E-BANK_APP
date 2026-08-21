@@ -453,7 +453,7 @@ pipeline {
             }
         }
 
-        stage('Verify Deployment') {
+                stage('Verify Deployment') {
             when {
                 expression {
                     params.DEPLOY_TO_EKS
@@ -507,6 +507,8 @@ pipeline {
                 }
             }
         }
+    }
+
     post {
         success {
             echo '''
@@ -538,3 +540,4 @@ pipeline {
         }
     }
 }
+           
