@@ -345,7 +345,7 @@ pipeline {
             }
         }
 
-        stage('Configure EKS') {
+                stage('Configure EKS') {
             when {
                 expression {
                     params.DEPLOY_TO_EKS
@@ -358,12 +358,19 @@ pipeline {
                      credentialsId: 'aws-ecr-credentials']
                 ]) {
                     sh '''
-                        echo "Configuring kubectl for EKS..."
+                        set -e
+
+                        echo "======================================"
+                        echo "Configuring kubectl for EKS"
+                        echo "======================================"
+
+                        aws sts get-caller-identity
 
                         aws eks update-kubeconfig \
                             --region ${AWS_REGION} \
                             --name ${EKS_CLUSTER}
 
+                        echo "Testing EKS access..."
                         kubectl cluster-info
                         kubectl get nodes
                     '''
@@ -379,11 +386,22 @@ pipeline {
             }
 
             steps {
-                sh '''
-                    kubectl create namespace ${K8S_NAMESPACE} \
-                        --dry-run=client \
-                        -o yaml | kubectl apply -f -
-                '''
+                withCredentials([
+                    [$class: 'AmazonWebServicesCredentialsBinding',
+                     credentialsId: 'aws-ecr-credentials']
+                ]) {
+                    sh '''
+                        set -e
+
+                        echo "Creating Kubernetes namespace..."
+
+                        kubectl create namespace ${K8S_NAMESPACE} \
+                            --dry-run=client \
+                            -o yaml | kubectl apply -f -
+
+                        kubectl get namespace ${K8S_NAMESPACE}
+                    '''
+                }
             }
         }
 
@@ -395,25 +413,43 @@ pipeline {
             }
 
             steps {
-                sh '''
-                    echo "Deploying E-Bank to EKS..."
+                withCredentials([
+                    [$class: 'AmazonWebServicesCredentialsBinding',
+                     credentialsId: 'aws-ecr-credentials']
+                ]) {
+                    sh '''
+                        set -e
 
-                    kubectl apply \
-                        -f k8s/ \
-                        -n ${K8S_NAMESPACE}
+                        echo "======================================"
+                        echo "Deploying E-Bank to EKS"
+                        echo "======================================"
 
-                    kubectl set image deployment/ebank-frontend \
-                        ebank-frontend=${ECR_REGISTRY}/${FRONTEND_REPO}:${IMAGE_TAG} \
-                        -n ${K8S_NAMESPACE}
+                        echo "Frontend image:"
+                        echo "${ECR_REGISTRY}/${FRONTEND_REPO}:${IMAGE_TAG}"
 
-                    kubectl set image deployment/ebank-node \
-                        ebank-node=${ECR_REGISTRY}/${NODE_REPO}:${IMAGE_TAG} \
-                        -n ${K8S_NAMESPACE}
+                        echo "Node image:"
+                        echo "${ECR_REGISTRY}/${NODE_REPO}:${IMAGE_TAG}"
 
-                    kubectl set image deployment/ebank-django \
-                        ebank-django=${ECR_REGISTRY}/${DJANGO_REPO}:${IMAGE_TAG} \
-                        -n ${K8S_NAMESPACE}
-                '''
+                        echo "Django image:"
+                        echo "${ECR_REGISTRY}/${DJANGO_REPO}:${IMAGE_TAG}"
+
+                        kubectl apply \
+                            -f k8s/ \
+                            -n ${K8S_NAMESPACE}
+
+                        kubectl set image deployment/ebank-frontend \
+                            ebank-frontend=${ECR_REGISTRY}/${FRONTEND_REPO}:${IMAGE_TAG} \
+                            -n ${K8S_NAMESPACE}
+
+                        kubectl set image deployment/ebank-node \
+                            ebank-node=${ECR_REGISTRY}/${NODE_REPO}:${IMAGE_TAG} \
+                            -n ${K8S_NAMESPACE}
+
+                        kubectl set image deployment/ebank-django \
+                            ebank-django=${ECR_REGISTRY}/${DJANGO_REPO}:${IMAGE_TAG} \
+                            -n ${K8S_NAMESPACE}
+                    '''
+                }
             }
         }
 
@@ -425,34 +461,52 @@ pipeline {
             }
 
             steps {
-                sh '''
-                    echo "Checking Kubernetes resources..."
+                withCredentials([
+                    [$class: 'AmazonWebServicesCredentialsBinding',
+                     credentialsId: 'aws-ecr-credentials']
+                ]) {
+                    sh '''
+                        set -e
 
-                    kubectl get pods -n ${K8S_NAMESPACE}
-                    kubectl get deployments -n ${K8S_NAMESPACE}
-                    kubectl get services -n ${K8S_NAMESPACE}
+                        echo "======================================"
+                        echo "Checking Kubernetes resources"
+                        echo "======================================"
 
-                    echo "Checking rollouts..."
+                        kubectl get pods \
+                            -n ${K8S_NAMESPACE}
 
-                    kubectl rollout status \
-                        deployment/ebank-frontend \
-                        -n ${K8S_NAMESPACE} \
-                        --timeout=5m
+                        kubectl get deployments \
+                            -n ${K8S_NAMESPACE}
 
-                    kubectl rollout status \
-                        deployment/ebank-node \
-                        -n ${K8S_NAMESPACE} \
-                        --timeout=5m
+                        kubectl get services \
+                            -n ${K8S_NAMESPACE}
 
-                    kubectl rollout status \
-                        deployment/ebank-django \
-                        -n ${K8S_NAMESPACE} \
-                        --timeout=5m
-                '''
+                        echo "======================================"
+                        echo "Checking rollouts"
+                        echo "======================================"
+
+                        kubectl rollout status \
+                            deployment/ebank-frontend \
+                            -n ${K8S_NAMESPACE} \
+                            --timeout=5m
+
+                        kubectl rollout status \
+                            deployment/ebank-node \
+                            -n ${K8S_NAMESPACE} \
+                            --timeout=5m
+
+                        kubectl rollout status \
+                            deployment/ebank-django \
+                            -n ${K8S_NAMESPACE} \
+                            --timeout=5m
+
+                        echo "======================================"
+                        echo "E-Bank deployment successful"
+                        echo "======================================"
+                    '''
+                }
             }
         }
-    }
-
     post {
         success {
             echo '''
