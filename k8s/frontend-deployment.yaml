@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ebank-node
+  namespace: ebank
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ebank-node
+  template:
+    metadata:
+      labels:
+        app: ebank-node
+    spec:
+      containers:
+        - name: ebank-node
+          image: 047385030300.dkr.ecr.us-east-2.amazonaws.com/dev-ebank-node-backend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: DJANGO_URL
+              value: http://ebank-django:8000
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
